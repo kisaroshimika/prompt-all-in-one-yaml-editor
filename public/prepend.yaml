@@ -1,0 +1,24 @@
+- name: テスト項目１
+  groups:
+    - name: 基本体位
+      color: rgba(251, 135, 158, .4)
+      tags:
+        test: 開くからファイルを選んでね
+        new_prompt: 翻訳機能はオマケです
+        missionary: 正常位
+        doggystyle: 後背位
+    - name: 口行為
+      color: rgba(7, 228, 0, 0.40)
+      tags:
+        fellatio: フェラ
+        irrumatio: イラマ
+- name: テスト項目２
+  groups:
+    - name: １新規グループ
+      color: rgba(99, 102, 241, 0.4)
+      tags:
+        new_prompt: １新規タグ
+    - name: ２新規グループ
+      color: rgba(99, 102, 241, 0.4)
+      tags:
+        new_prompt: ２新規タグ
