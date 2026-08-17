@@ -563,9 +563,11 @@ export default function App() {
                     onDelete={() => deleteCategory(catIdx)}
                     onAddSub={() => addGroup(catIdx)}
                     onRename={(newName) => {
-                      const newData = [...data];
-                      newData[catIdx].name = newName;
-                      setData(newData);
+                      setData(prev => {
+                        const newData = [...prev];
+                        newData[catIdx] = { ...newData[catIdx], name: newName };
+                        return newData;
+                      });
                     }}
                     onClick={() => {
                       setActiveCategoryIndex(catIdx);
@@ -591,9 +593,15 @@ export default function App() {
                               isActive={activeGroupIndex === grpIdx}
                               onDelete={() => deleteGroup(catIdx, grpIdx)}
                               onRename={(newName) => {
-                                const newData = [...data];
-                                newData[catIdx].groups[grpIdx].name = newName;
-                                setData(newData);
+                                setData(prev => {
+                                  const newData = [...prev];
+                                  const category = { ...newData[catIdx] };
+                                  const groups = [...category.groups];
+                                  groups[grpIdx] = { ...groups[grpIdx], name: newName };
+                                  category.groups = groups;
+                                  newData[catIdx] = category;
+                                  return newData;
+                                });
                               }}
                               onClick={() => {
                                 setActiveCategoryIndex(catIdx);
