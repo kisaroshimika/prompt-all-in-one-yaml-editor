@@ -61,7 +61,7 @@ export function parseYAML(yamlString) {
     }
   } catch (e) {
     console.error('YAML Parse Error:', e);
-    return [];
+    return null;
   }
 }
 

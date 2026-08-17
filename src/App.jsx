@@ -96,15 +96,19 @@ export default function App() {
     const reader = new FileReader();
     reader.onload = (re) => {
       const parsed = parseYAML(re.target.result);
-      if (parsed && parsed.length > 0) {
-        setData(parsed);
-        setIsDataLoaded(true);
-        setActiveCategoryIndex(0);
-        setActiveGroupIndex(0);
-        setLoadError(null);
-      } else {
-        alert('YAMLファイルを読み込めませんでした。形式が正しいか確認してください。');
+      if (parsed === null) {
+        alert('YAMLファイルの解析に失敗しました。\n記述形式（インデントやコロン等）が正しいか確認してください。');
+        return;
       }
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        alert('読み込んだYAMLファイルに有効なカテゴリデータが含まれていませんでした。');
+        return;
+      }
+      setData(parsed);
+      setIsDataLoaded(true);
+      setActiveCategoryIndex(0);
+      setActiveGroupIndex(0);
+      setLoadError(null);
     };
     reader.readAsText(file);
   };
