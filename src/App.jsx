@@ -433,20 +433,38 @@ export default function App() {
 
       if (activeIdStr.startsWith('tag-') && overIdStr.startsWith('tag-')) {
         if (searchQuery) return; // 検索中は並び替えをブロック
+        
+        let catIdx = -1, grpIdx = -1;
+        for (let c = 0; c < data.length; c++) {
+          const currentCat = data[c];
+          if (!currentCat || !currentCat.groups) continue;
+          for (let g = 0; g < currentCat.groups.length; g++) {
+            if (currentCat.groups[g]?.tagList?.some(t => t.id === active.id)) {
+              catIdx = c;
+              grpIdx = g;
+              break;
+            }
+          }
+          if (catIdx !== -1) break;
+        }
+
+        if (catIdx === -1 || grpIdx === -1) return;
+
         const newData = [...data];
-        const category = { ...newData[activeCategoryIndex] };
+        const category = { ...newData[catIdx] };
         const groups = [...category.groups];
-        const group = { ...groups[activeGroupIndex] };
-        const safeTagList = group.tagList || [];
+        const group = { ...groups[grpIdx] };
+        const safeTagList = [...(group.tagList || [])];
         const oldIndex = safeTagList.findIndex(t => t.id === active.id);
         const newIndex = safeTagList.findIndex(t => t.id === over.id);
         if (oldIndex !== -1 && newIndex !== -1) {
           group.tagList = arrayMove(safeTagList, oldIndex, newIndex);
-          groups[activeGroupIndex] = group;
+          groups[grpIdx] = group;
           category.groups = groups;
-          newData[activeCategoryIndex] = category;
+          newData[catIdx] = category;
           setData(newData);
         }
+        return;
       }
     } catch (e) {
       console.error("DragEnd processing error:", e);
