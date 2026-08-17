@@ -254,18 +254,34 @@ export default function App() {
     if (!window.confirm('カテゴリを削除しますか？')) return;
     const newData = data.filter((_, i) => i !== catIdx);
     setData(newData);
-    setActiveCategoryIndex(0);
+    
+    const newCatIdx = Math.min(activeCategoryIndex, Math.max(0, newData.length - 1));
+    setActiveCategoryIndex(newCatIdx);
+    setActiveGroupIndex(0);
   };
 
   const deleteGroup = (catIdx, grpIdx) => {
     if (!window.confirm('グループを削除しますか？')) return;
+    
+    const targetCat = data[catIdx];
+    if (!targetCat) return;
+    
+    const newGroups = targetCat.groups.filter((_, i) => i !== grpIdx);
+    
     setData(prev => {
       const newData = [...prev];
-      const category = { ...newData[catIdx] };
-      category.groups = category.groups.filter((_, i) => i !== grpIdx);
+      const category = { ...newData[catIdx], groups: newGroups };
       newData[catIdx] = category;
       return newData;
     });
+
+    if (activeCategoryIndex === catIdx) {
+      if (newGroups.length === 0) {
+        setActiveGroupIndex(0);
+      } else if (activeGroupIndex >= grpIdx) {
+        setActiveGroupIndex(Math.max(0, activeGroupIndex - 1));
+      }
+    }
   };
 
   const updateGroupColor = (colorObj) => {
