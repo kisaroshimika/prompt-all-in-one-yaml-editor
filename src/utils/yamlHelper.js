@@ -72,11 +72,26 @@ export function stringifyYAML(data) {
   const output = data.map(cat => {
     return {
       name: cat.name,
-      groups: cat.groups.map(group => {
+      groups: (cat.groups || []).map(group => {
         const tags = {};
-        group.tagList.forEach(tag => {
-          tags[tag.prompt] = tag.label;
+        const usedPrompts = new Set();
+
+        (group.tagList || []).forEach(tag => {
+          let safePrompt = (tag.prompt || 'unnamed_prompt').trim();
+          
+          if (usedPrompts.has(safePrompt)) {
+            let counter = 2;
+            while (usedPrompts.has(`${safePrompt}_${counter}`)) {
+              counter++;
+            }
+            console.warn(`[YAML Save Warning] 重複したプロンプトを検知しました: "${safePrompt}" -> "${safePrompt}_${counter}" に自動補正して保存します。`);
+            safePrompt = `${safePrompt}_${counter}`;
+          }
+
+          usedPrompts.add(safePrompt);
+          tags[safePrompt] = tag.label || '';
         });
+
         return {
           name: group.name,
           color: group.color,
