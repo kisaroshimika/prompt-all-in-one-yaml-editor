@@ -28,18 +28,18 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
   };
 
   const handleSave = () => {
-    const trimmedPrompt = editPrompt.trim();
-    if (!trimmedPrompt) {
+    const sanitizedPrompt = editPrompt.replace(/[\r\n]+/g, ' ').trim();
+    if (!sanitizedPrompt) {
       alert("プロンプト名は空にできません。");
       return;
     }
-    if (existingPrompts.includes(trimmedPrompt)) {
-      alert(`「${trimmedPrompt}」は同じグループ内に既に存在します。\nプロンプト名はグループ内で一意である必要があります。`);
+    if (existingPrompts.includes(sanitizedPrompt) && sanitizedPrompt !== prompt) {
+      alert(`「${sanitizedPrompt}」は同じグループ内に既に存在します。\nプロンプト名はグループ内で一意である必要があります。`);
       return;
     }
     
-    onUpdate({ label: editLabel, prompt: trimmedPrompt });
-    setEditPrompt(trimmedPrompt);
+    onUpdate({ label: editLabel, prompt: sanitizedPrompt });
+    setEditPrompt(sanitizedPrompt);
     setIsEditing(false);
   };
 
@@ -53,7 +53,7 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
         setEditPrompt(prompt);
         setIsEditing(true);
       }}
-      className={`glass tag-card group p-6 rounded-2xl border flex flex-col transition-colors ${isDragging ? 'is-dragging' : ''} ${isEditing ? 'border-indigo-400' : ''}`}
+      className={`glass tag-card group p-6 rounded-2xl border flex flex-col transition-colors min-w-0 ${isDragging ? 'is-dragging' : ''} ${isEditing ? 'border-indigo-400' : ''}`}
     >
       <div 
         className="absolute top-0 left-0 w-full h-1.5 rounded-t-2xl" 
@@ -63,7 +63,7 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
         }}
       />
       
-      <div className="flex-1 flex flex-col gap-4 relative">
+      <div className="flex-1 flex flex-col gap-4 relative min-w-0">
         {isEditing ? (
           <div onPointerDown={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()} className="pointer-events-auto flex flex-col gap-3">
             <div className="flex flex-col gap-1">
@@ -71,7 +71,12 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
               <input 
                 autoFocus
                 value={editPrompt} 
-                onChange={e => setEditPrompt(e.target.value)}
+                onChange={e => setEditPrompt(e.target.value.replace(/[\r\n]+/g, ' '))}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    handleSave();
+                  }
+                }}
                 className="w-full text-sm font-mono text-indigo-400 bg-white/5 border border-white/10 rounded-lg p-2"
               />
             </div>
@@ -80,6 +85,11 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
               <input 
                 value={editLabel} 
                 onChange={e => setEditLabel(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    handleSave();
+                  }
+                }}
                 className="w-full text-base text-white bg-white/5 border border-white/10 rounded-lg p-2"
               />
             </div>
@@ -96,16 +106,16 @@ export function TagCard({ id, prompt, label, color, onUpdate, onDelete, onTransl
           </div>
         ) : (
           <>
-            <div className="pr-8">
+            <div className="pr-8 min-w-0 w-full">
               {path && (
-                <div className="text-[10px] text-indigo-300 font-bold mb-2 bg-indigo-500/10 inline-block px-2 py-0.5 rounded-full border border-indigo-500/20">
+                <div className="text-[10px] text-indigo-300 font-bold mb-2 bg-indigo-500/10 inline-block px-2 py-0.5 rounded-full border border-indigo-500/20 truncate max-w-full">
                   {path}
                 </div>
               )}
-              <span className="text-xs font-mono text-gray-500 truncate block mb-1 opacity-70 group-hover:opacity-100 transition-opacity" title={prompt}>
+              <span className="text-xs font-mono text-gray-500 line-clamp-3 break-words block mb-1 opacity-70 group-hover:opacity-100 transition-opacity" title={prompt}>
                 {prompt}
               </span>
-              <h3 className="text-xl font-bold text-white leading-tight">{label}</h3>
+              <h3 className="text-xl font-bold text-white leading-tight break-words">{label}</h3>
             </div>
             
             <div onPointerDown={e => e.stopPropagation()} className="flex items-center gap-3 pt-4 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-all pointer-events-auto">

@@ -285,6 +285,14 @@ input[type="file"].hidden-input {
 .cursor-pointer { cursor: pointer; }
 .cursor-grab { cursor: grab; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.min-w-0 { min-width: 0; }
+.break-words { overflow-wrap: break-word; word-break: break-word; }
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .text-xs { font-size: 0.85rem; }
 .text-sm { font-size: 1rem; }
